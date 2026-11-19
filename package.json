@@ -9,7 +9,12 @@
     "preview": "vite preview"
   },
   "keywords": [],
-  "author": "",
+  "author": "Om Bhalerao",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tyranthOM/scamyyy.git"
+  },
+  "homepage": "https://scamyyy.vercel.app",
   "license": "ISC",
   "type": "module",
   "dependencies": {

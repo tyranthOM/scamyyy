@@ -7,7 +7,7 @@ A high-performance web application and Chrome Extension designed for academic re
 ## Architecture & Directory Structure
 
 ```
-EaseWay/
+iLoveSwap/
 ├── public/                       # Static public assets copied directly to dist/
 │   ├── icons/                    # Chrome extension icons (16px, 48px, 128px)
 │   ├── icon.svg                  # Vector application logo
@@ -74,8 +74,8 @@ EaseWay/
 ### Installation
 ```bash
 # Clone the repository
-git clone <repository-url>
-cd EaseWay
+git clone https://github.com/tyranthOM/scamyyy.git
+cd scamyyy
 
 # Install dependencies
 npm install
@@ -134,6 +134,13 @@ vercel
 5. Click **Load unpacked** in the top-left corner.
 6. Select the `dist/` folder inside this project directory.
 7. The **iLoveSwap** icon will appear in your browser toolbar ready to use!
+
+---
+
+## Author & Maintainer
+Created and maintained by **Om Bhalerao** ([@tyranthOM](https://github.com/tyranthOM)).
+* Live Demo: [https://scamyyy.vercel.app](https://scamyyy.vercel.app)
+* Repository: [https://github.com/tyranthOM/scamyyy](https://github.com/tyranthOM/scamyyy)
 
 ---
 
