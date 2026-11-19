@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>iLoveSwap — Cinematic Motion Intro</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,6 +13,7 @@
       margin: 0;
       padding: 0;
       user-select: none;
+      -webkit-tap-highlight-color: transparent;
     }
 
     :root {
@@ -26,27 +27,39 @@
       --text-muted: #94a3b8;
     }
 
-    body {
+    html, body {
       background: #000;
       width: 100vw;
       height: 100vh;
+      height: 100dvh;
       overflow: hidden;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
       color: var(--text-main);
     }
 
-    /* Fixed 1920x1080 stage scaled responsively */
+    /* Fixed master stage scaled dynamically based on screen orientation */
     #stage-container {
-      width: 1920px;
-      height: 1080px;
       position: relative;
       overflow: hidden;
       background: var(--bg);
       transform-origin: center center;
-      box-shadow: 0 0 100px rgba(0,0,0,0.8);
+      box-shadow: 0 0 100px rgba(0,0,0,0.9);
+      cursor: pointer;
+    }
+
+    /* Desktop / Landscape Mode (1920 x 1080) */
+    #stage-container.landscape {
+      width: 1920px;
+      height: 1080px;
+    }
+
+    /* Mobile / Portrait Mode (1080 x 1920 - 9:16 vertical format) */
+    #stage-container.portrait {
+      width: 1080px;
+      height: 1920px;
     }
 
     /* Ambient dynamic background */
@@ -58,8 +71,8 @@
 
     .bg-grid {
       background-image: 
-        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+        linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
       background-size: 60px 60px;
       background-position: center center;
     }
@@ -69,9 +82,11 @@
       width: 900px;
       height: 900px;
       border-radius: 50%;
-      filter: blur(140px);
-      opacity: 0.18;
+      filter: blur(120px);
+      -webkit-filter: blur(120px);
+      opacity: 0.22;
       pointer-events: none;
+      transform: translate3d(0,0,0);
     }
 
     .orb-red {
@@ -90,6 +105,7 @@
       position: absolute;
       inset: 0;
       opacity: 0.04;
+      pointer-events: none;
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
     }
 
@@ -99,6 +115,7 @@
       inset: 0;
       perspective: 1200px;
       overflow: hidden;
+      transform: translate3d(0,0,0);
     }
 
     #world {
@@ -109,7 +126,7 @@
       will-change: transform;
     }
 
-    /* Cinematic Letterbox Masking */
+    /* Cinema HUD bar */
     .cinema-bar {
       position: absolute;
       left: 0;
@@ -118,19 +135,19 @@
       background: #030408;
       z-index: 100;
     }
-    .cinema-bar.top { top: 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
-    .cinema-bar.bottom { bottom: 0; border-top: 1px solid rgba(255,255,255,0.05); }
+    .cinema-bar.top { top: 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .cinema-bar.bottom { bottom: 0; border-top: 1px solid rgba(255,255,255,0.06); }
 
     .header-hud {
       position: absolute;
       top: 14px;
-      left: 60px;
-      right: 60px;
+      left: 50px;
+      right: 50px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 13px;
+      font-size: 14px;
       color: var(--text-muted);
       letter-spacing: 2px;
       text-transform: uppercase;
@@ -153,16 +170,31 @@
     /* Typography & Claims */
     .headline-container {
       position: absolute;
+      z-index: 20;
+      transition: all 0.3s ease;
+    }
+
+    /* Landscape Layout */
+    .landscape .headline-container {
       left: 120px;
       top: 180px;
       max-width: 800px;
-      z-index: 20;
+      text-align: left;
+    }
+
+    /* Portrait Mobile Layout */
+    .portrait .headline-container {
+      left: 60px;
+      right: 60px;
+      top: 130px;
+      max-width: 100%;
+      text-align: center;
     }
 
     .kicker {
       font-family: 'JetBrains Mono', monospace;
       font-size: 16px;
-      font-weight: 500;
+      font-weight: 600;
       color: var(--brand);
       text-transform: uppercase;
       letter-spacing: 3px;
@@ -170,6 +202,10 @@
       display: flex;
       align-items: center;
       gap: 12px;
+    }
+    .portrait .kicker {
+      font-size: 22px;
+      justify-content: center;
     }
 
     .kicker-line {
@@ -180,11 +216,16 @@
 
     .claim-text {
       font-size: 64px;
-      font-weight: 700;
+      font-weight: 800;
       line-height: 1.15;
       letter-spacing: -1.5px;
       color: #ffffff;
       margin-bottom: 24px;
+    }
+    .portrait .claim-text {
+      font-size: 72px;
+      line-height: 1.12;
+      margin-bottom: 20px;
     }
 
     .claim-text .accent-red {
@@ -194,7 +235,7 @@
 
     .claim-text .accent-emerald {
       color: var(--accent-emerald);
-      text-shadow: 0 0 35px rgba(16, 185, 129, 0.4);
+      text-shadow: 0 0 35px rgba(16, 185, 129, 0.45);
     }
 
     .sub-tagline {
@@ -203,32 +244,54 @@
       color: var(--text-muted);
       line-height: 1.5;
     }
+    .portrait .sub-tagline {
+      font-size: 30px;
+      line-height: 1.45;
+      max-width: 880px;
+      margin: 0 auto;
+    }
 
     /* 3D Lab Manual Document */
     .doc-3d-wrapper {
       position: absolute;
+      transform-style: preserve-3d;
+      perspective: 1000px;
+      will-change: transform;
+    }
+
+    .landscape .doc-3d-wrapper {
       right: 140px;
       top: 50%;
       transform: translateY(-50%);
       width: 600px;
       height: 780px;
-      transform-style: preserve-3d;
-      perspective: 1000px;
+    }
+
+    .portrait .doc-3d-wrapper {
+      left: 50%;
+      top: 570px;
+      transform: translateX(-50%);
+      width: 820px;
+      height: 1060px;
     }
 
     .doc-card {
       width: 100%;
       height: 100%;
       background: #ffffff;
-      border-radius: 12px;
+      border-radius: 14px;
       box-shadow: 
-        0 35px 80px rgba(0, 0, 0, 0.7),
+        0 40px 90px rgba(0, 0, 0, 0.75),
         0 0 60px rgba(229, 50, 45, 0.15);
       color: #1e293b;
       padding: 44px 48px;
       position: relative;
       overflow: hidden;
       border: 1px solid rgba(255,255,255,0.4);
+    }
+    .portrait .doc-card {
+      padding: 56px 60px;
+      border-radius: 20px;
     }
 
     /* Document Internal Academic Styling */
@@ -238,6 +301,10 @@
       margin-bottom: 24px;
       text-align: center;
     }
+    .portrait .doc-header {
+      padding-bottom: 28px;
+      margin-bottom: 32px;
+    }
 
     .doc-inst {
       font-size: 15px;
@@ -246,6 +313,7 @@
       text-transform: uppercase;
       color: #0f172a;
     }
+    .portrait .doc-inst { font-size: 20px; }
 
     .doc-dept {
       font-size: 12px;
@@ -253,6 +321,7 @@
       color: #64748b;
       margin-top: 4px;
     }
+    .portrait .doc-dept { font-size: 16px; margin-top: 6px; }
 
     .doc-aim-title {
       font-size: 14px;
@@ -262,6 +331,7 @@
       letter-spacing: 0.5px;
       margin-top: 14px;
     }
+    .portrait .doc-aim-title { font-size: 18px; margin-top: 18px; }
 
     .doc-aim-text {
       font-size: 13px;
@@ -269,6 +339,7 @@
       line-height: 1.4;
       margin-top: 4px;
     }
+    .portrait .doc-aim-text { font-size: 17px; line-height: 1.5; margin-top: 8px; }
 
     /* Student Identity Table (Target Fields) */
     .identity-table {
@@ -279,6 +350,11 @@
       margin-bottom: 24px;
       position: relative;
     }
+    .portrait .identity-table {
+      padding: 24px 28px;
+      border-radius: 12px;
+      margin-bottom: 32px;
+    }
 
     .identity-row {
       display: flex;
@@ -287,6 +363,10 @@
       padding: 8px 0;
       border-bottom: 1px dashed #cbd5e1;
       font-size: 14px;
+    }
+    .portrait .identity-row {
+      padding: 14px 0;
+      font-size: 18px;
     }
     .identity-row:last-child {
       border-bottom: none;
@@ -300,6 +380,7 @@
       text-transform: uppercase;
       letter-spacing: 1px;
     }
+    .portrait .id-label { font-size: 16px; }
 
     .id-value-box {
       position: relative;
@@ -308,6 +389,12 @@
       font-weight: 700;
       font-family: 'JetBrains Mono', monospace;
       font-size: 14px;
+      transition: background-color 0.2s;
+    }
+    .portrait .id-value-box {
+      font-size: 18px;
+      padding: 6px 14px;
+      border-radius: 6px;
     }
 
     .id-value-box.old {
@@ -322,7 +409,7 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      box-shadow: 0 0 16px rgba(16, 185, 129, 0.3);
+      box-shadow: 0 0 16px rgba(16, 185, 129, 0.35);
     }
 
     /* Mock code & conclusion content in document */
@@ -336,6 +423,12 @@
       line-height: 1.6;
       margin-bottom: 20px;
     }
+    .portrait .mock-code {
+      font-size: 15px;
+      padding: 24px;
+      border-radius: 10px;
+      line-height: 1.65;
+    }
 
     .mock-code span.kw { color: #f43f5e; }
     .mock-code span.fn { color: #38bdf8; }
@@ -345,9 +438,9 @@
       position: absolute;
       right: 36px;
       bottom: 36px;
-      width: 110px;
-      height: 110px;
-      border: 3px dashed var(--accent-emerald);
+      width: 120px;
+      height: 120px;
+      border: 4px dashed var(--accent-emerald);
       border-radius: 50%;
       display: flex;
       flex-direction: column;
@@ -356,12 +449,19 @@
       color: var(--accent-emerald);
       font-family: 'JetBrains Mono', monospace;
       font-weight: 800;
-      font-size: 11px;
+      font-size: 12px;
       text-transform: uppercase;
       letter-spacing: 1px;
       transform: rotate(-14deg);
       opacity: 0;
       pointer-events: none;
+    }
+    .portrait .doc-stamp {
+      width: 160px;
+      height: 160px;
+      right: 50px;
+      bottom: 50px;
+      font-size: 15px;
     }
 
     /* Laser Scanner Beam */
@@ -390,17 +490,22 @@
 
     .hud-target-tag {
       position: absolute;
-      top: -22px;
+      top: -24px;
       left: 0;
       background: var(--brand);
       color: #ffffff;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 10px;
+      font-size: 11px;
       font-weight: 700;
-      padding: 2px 6px;
+      padding: 3px 8px;
       border-radius: 3px;
       text-transform: uppercase;
       letter-spacing: 1px;
+    }
+    .portrait .hud-target-tag {
+      font-size: 14px;
+      top: -30px;
+      padding: 4px 10px;
     }
 
     /* Final Climax Brand Center */
@@ -414,6 +519,8 @@
       z-index: 60;
       opacity: 0;
       pointer-events: none;
+      padding: 40px;
+      text-align: center;
     }
 
     .brand-logo-icon {
@@ -427,8 +534,13 @@
       box-shadow: 
         0 25px 60px rgba(229, 50, 45, 0.5),
         0 0 0 1px rgba(255, 255, 255, 0.2);
-      margin-bottom: 30px;
-      position: relative;
+      margin-bottom: 28px;
+    }
+    .portrait .brand-logo-icon {
+      width: 180px;
+      height: 180px;
+      border-radius: 40px;
+      margin-bottom: 36px;
     }
 
     .brand-logo-icon svg {
@@ -438,6 +550,10 @@
       stroke: #ffffff;
       stroke-width: 2.5;
     }
+    .portrait .brand-logo-icon svg {
+      width: 96px;
+      height: 96px;
+    }
 
     .brand-title {
       font-size: 88px;
@@ -445,6 +561,11 @@
       letter-spacing: -2px;
       color: #ffffff;
       margin-bottom: 14px;
+    }
+    .portrait .brand-title {
+      font-size: 108px;
+      letter-spacing: -3px;
+      margin-bottom: 18px;
     }
 
     .brand-title span {
@@ -459,27 +580,80 @@
       letter-spacing: 0.5px;
       margin-bottom: 36px;
     }
+    .portrait .brand-subtitle {
+      font-size: 36px;
+      margin-bottom: 48px;
+      line-height: 1.4;
+    }
 
     .brand-url-pill {
       display: inline-flex;
       align-items: center;
       gap: 12px;
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
       padding: 12px 28px;
       border-radius: 999px;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 16px;
+      font-size: 18px;
       color: #ffffff;
       box-shadow: 0 10px 30px rgba(0,0,0,0.4);
     }
+    .portrait .brand-url-pill {
+      font-size: 26px;
+      padding: 18px 44px;
+    }
 
     .brand-url-pill .url-dot {
-      width: 10px;
-      height: 10px;
+      width: 12px;
+      height: 12px;
       border-radius: 50%;
       background: var(--accent-emerald);
-      box-shadow: 0 0 12px var(--accent-emerald);
+      box-shadow: 0 0 14px var(--accent-emerald);
+    }
+
+    /* Floating Touch / Tap Status Pill */
+    #touch-toast {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.85);
+      background: rgba(15, 23, 42, 0.88);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #ffffff;
+      padding: 12px 24px;
+      border-radius: 999px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 1000;
+    }
+    #touch-toast.show {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    /* Mobile Quick Control Hint at Bottom */
+    .mobile-hint {
+      position: absolute;
+      bottom: 12px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.4);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      z-index: 102;
+      pointer-events: none;
     }
 
     /* Scrub Bar for ?debug=1 */
@@ -517,8 +691,11 @@
 </head>
 <body>
 
-  <div id="stage-container">
-    <!-- Letterbox Bars -->
+  <!-- Touch Notification Indicator -->
+  <div id="touch-toast">Paused</div>
+
+  <div id="stage-container" class="landscape">
+    <!-- Cinema Letterbox Bars -->
     <div class="cinema-bar top"></div>
     <div class="cinema-bar bottom"></div>
 
@@ -612,7 +789,7 @@
             <!-- Verified Stamp -->
             <div class="doc-stamp" id="doc-stamp">
               <span>Verified</span>
-              <span style="font-size:16px;">✓</span>
+              <span style="font-size:18px;">✓</span>
               <span>iLoveSwap</span>
             </div>
 
@@ -642,6 +819,9 @@
 
       </div>
     </div>
+
+    <!-- Mobile interaction footer hint -->
+    <div class="mobile-hint">Tap anywhere to play / pause</div>
   </div>
 
   <!-- Debug Scrubber (?debug=1) -->
@@ -655,27 +835,7 @@
   <!-- GSAP CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script>
-    // Scale stage responsively to fit 1920x1080 into any screen
-    function resizeStage() {
-      const stage = document.getElementById('stage-container');
-      const scaleX = window.innerWidth / 1920;
-      const scaleY = window.innerHeight / 1080;
-      const scale = Math.min(scaleX, scaleY);
-      stage.style.transform = `scale(${scale})`;
-    }
-    window.addEventListener('resize', resizeStage);
-    resizeStage();
-
-    // Check debug mode
-    const urlParams = new URLSearchParams(window.location.search);
-    const isDebug = urlParams.get('debug') === '1';
-    const isClean = urlParams.get('clean') === '1';
-
-    if (isDebug) {
-      document.getElementById('debug-panel').style.display = 'flex';
-    }
-
-    // Elements
+    const stage = document.getElementById('stage-container');
     const world = document.getElementById('world');
     const headlineBox = document.getElementById('headline-box');
     const kickerEl = document.getElementById('kicker-el');
@@ -694,6 +854,65 @@
     const docStamp = document.getElementById('doc-stamp');
     const brandClimax = document.getElementById('brand-climax');
     const timeCode = document.getElementById('time-code');
+    const touchToast = document.getElementById('touch-toast');
+
+    let isPortraitMode = false;
+
+    // Dynamically adapt stage to screen orientation
+    function updateResponsiveStage() {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      isPortraitMode = w < h;
+
+      const targetW = isPortraitMode ? 1080 : 1920;
+      const targetH = isPortraitMode ? 1920 : 1080;
+
+      stage.style.width = targetW + 'px';
+      stage.style.height = targetH + 'px';
+
+      if (isPortraitMode) {
+        stage.classList.add('portrait');
+        stage.classList.remove('landscape');
+      } else {
+        stage.classList.add('landscape');
+        stage.classList.remove('portrait');
+      }
+
+      const scale = Math.min(w / targetW, h / targetH);
+      stage.style.transform = `scale(${scale})`;
+
+      // Adjust 3D camera angles slightly for mobile portrait
+      if (isPortraitMode) {
+        gsap.set(docWrapper, { 
+          rotationY: -8,
+          rotationX: 8,
+          rotationZ: 1,
+          z: -40
+        });
+      } else {
+        gsap.set(docWrapper, { 
+          rotationY: -18,
+          rotationX: 10,
+          rotationZ: 3,
+          z: -100
+        });
+      }
+    }
+
+    window.addEventListener('resize', updateResponsiveStage);
+    window.addEventListener('orientationchange', () => {
+      setTimeout(updateResponsiveStage, 100);
+    });
+    updateResponsiveStage();
+
+    // Check debug mode
+    const urlParams = new URLSearchParams(window.location.search);
+    const isDebug = urlParams.get('debug') === '1';
+    const isClean = urlParams.get('clean') === '1';
+
+    if (isDebug) {
+      document.getElementById('debug-panel').style.display = 'flex';
+    }
 
     // Master Timeline (16.0 Seconds Duration)
     const tl = gsap.timeline({
@@ -712,37 +931,31 @@
       }
     });
 
-    // Initial 3D States
-    gsap.set(world, { transformOrigin: "50% 50% -300px" });
-    gsap.set(docWrapper, { 
-      rotationY: -18,
-      rotationX: 10,
-      rotationZ: 3,
-      z: -100
-    });
+    // Initial 3D States (Hardware accelerated, no blur filter crash)
+    gsap.set(world, { transformOrigin: "50% 50% -250px" });
     gsap.set(scannerLine, { top: "5%" });
     gsap.set(targetBox, { opacity: 0 });
 
     // ==========================================
     // ACT 1: THE HOOK (0.0s - 4.0s)
-    // "Lab manual teman, identitas kamu."
+    // "Your friend's manual, now your identity."
     // ==========================================
     tl.fromTo(headlineBox, 
-      { opacity: 0, x: -60, filter: "blur(12px)" },
-      { opacity: 1, x: 0, filter: "blur(0px)", duration: 1.0, ease: "power3.out" },
+      { opacity: 0, y: 30 },
+      { opacity: 1, y: 0, duration: 1.0, ease: "power3.out" },
       0.2
     );
 
     tl.fromTo(docWrapper,
-      { opacity: 0, scale: 0.85, x: 120, rotationY: -35 },
-      { opacity: 1, scale: 1, x: 0, rotationY: -18, duration: 1.4, ease: "power2.out" },
+      { opacity: 0, scale: 0.88, z: -200 },
+      { opacity: 1, scale: 1, z: isPortraitMode ? -40 : -100, duration: 1.3, ease: "power2.out" },
       0.3
     );
 
     // Subtle breathing camera drift
     tl.to(world, {
       z: 50,
-      rotationY: 3,
+      rotationY: 2,
       duration: 3.5,
       ease: "sine.inOut"
     }, 0);
@@ -753,9 +966,8 @@
     // ==========================================
     tl.to(headlineBox, {
       opacity: 0,
-      x: -40,
-      filter: "blur(8px)",
-      duration: 0.6,
+      y: -20,
+      duration: 0.5,
       ease: "power2.in"
     }, 3.8);
 
@@ -763,21 +975,20 @@
       kickerText.textContent = "Autonomous Tag Isolation";
       claimEl.innerHTML = `One click,<br><span class="accent-red">all tags locked in.</span>`;
       subtagEl.textContent = "Instantly isolates Name, Roll Number, Batch, Division, and PRN directly on canvas.";
-    }, 4.4);
+    }, 4.3);
 
     tl.to(headlineBox, {
       opacity: 1,
-      x: 0,
-      filter: "blur(0px)",
-      duration: 0.8,
+      y: 0,
+      duration: 0.7,
       ease: "power3.out"
-    }, 4.5);
+    }, 4.4);
 
     // Camera zooms closer toward the document
     tl.to(world, {
-      z: 220,
-      x: -120,
-      rotationY: -6,
+      z: isPortraitMode ? 160 : 220,
+      x: isPortraitMode ? 0 : -120,
+      rotationY: isPortraitMode ? -2 : -6,
       duration: 3.5,
       ease: "power2.inOut"
     }, 4.0);
@@ -794,20 +1005,20 @@
       ease: "power1.inOut"
     }, 4.5);
 
-    // Target box locks over Identity Table
-    const tableOffsetTop = 155;
-    const tableOffsetHeight = 160;
-    tl.set(targetBox, {
-      top: tableOffsetTop + "px",
-      left: "40px",
-      right: "40px",
-      height: tableOffsetHeight + "px"
-    }, 5.2);
+    // Dynamically calculate and lock Target Box over Identity Table
+    tl.add(() => {
+      const topOffset = identTable.offsetTop || 155;
+      const heightOffset = identTable.offsetHeight || 160;
+      targetBox.style.top = topOffset + "px";
+      targetBox.style.left = isPortraitMode ? "48px" : "40px";
+      targetBox.style.right = isPortraitMode ? "48px" : "40px";
+      targetBox.style.height = heightOffset + "px";
+    }, 5.1);
 
     tl.fromTo(targetBox,
       { opacity: 0, scale: 1.08 },
       { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(2)" },
-      5.3
+      5.2
     );
 
     tl.to(scannerLine, { opacity: 0, duration: 0.3 }, 6.7);
@@ -818,8 +1029,7 @@
     // ==========================================
     tl.to(headlineBox, {
       opacity: 0,
-      x: -40,
-      filter: "blur(8px)",
+      y: -20,
       duration: 0.5,
       ease: "power2.in"
     }, 7.5);
@@ -832,31 +1042,30 @@
 
     tl.to(headlineBox, {
       opacity: 1,
-      x: 0,
-      filter: "blur(0px)",
-      duration: 0.8,
+      y: 0,
+      duration: 0.7,
       ease: "power3.out"
     }, 8.1);
 
-    // Dramatic close-up on the Identity fields
+    // Camera zooms close to the Identity fields
     tl.to(world, {
-      z: 380,
-      x: -280,
-      y: -20,
-      rotationY: 2,
+      z: isPortraitMode ? 260 : 380,
+      x: isPortraitMode ? 0 : -280,
+      y: isPortraitMode ? -60 : -20,
+      rotationY: 0,
       duration: 3.5,
       ease: "power2.out"
     }, 7.8);
 
-    // Swap fields one by one with punchy stamps
+    // Swap fields one by one with spring punch
     tl.add(() => {
       nameBox.className = "id-value-box new";
       nameBox.innerHTML = `Om Bhalerao <span style="font-size:12px;">✓</span>`;
     }, 8.4);
 
     tl.fromTo(nameBox, 
-      { scale: 1.35, filter: "brightness(2)" },
-      { scale: 1, filter: "brightness(1)", duration: 0.35, ease: "back.out(2.5)" },
+      { scale: 1.35 },
+      { scale: 1, duration: 0.35, ease: "back.out(2.5)" },
       8.4
     );
 
@@ -866,8 +1075,8 @@
     }, 8.8);
 
     tl.fromTo(rollBox, 
-      { scale: 1.35, filter: "brightness(2)" },
-      { scale: 1, filter: "brightness(1)", duration: 0.35, ease: "back.out(2.5)" },
+      { scale: 1.35 },
+      { scale: 1, duration: 0.35, ease: "back.out(2.5)" },
       8.8
     );
 
@@ -877,8 +1086,8 @@
     }, 9.2);
 
     tl.fromTo(batchBox, 
-      { scale: 1.35, filter: "brightness(2)" },
-      { scale: 1, filter: "brightness(1)", duration: 0.35, ease: "back.out(2.5)" },
+      { scale: 1.35 },
+      { scale: 1, duration: 0.35, ease: "back.out(2.5)" },
       9.2
     );
 
@@ -888,8 +1097,8 @@
     }, 9.6);
 
     tl.fromTo(prnBox, 
-      { scale: 1.35, filter: "brightness(2)" },
-      { scale: 1, filter: "brightness(1)", duration: 0.35, ease: "back.out(2.5)" },
+      { scale: 1.35 },
+      { scale: 1, duration: 0.35, ease: "back.out(2.5)" },
       9.6
     );
 
@@ -909,9 +1118,8 @@
 
     // ==========================================
     // ACT 4: CLIMAX & BRAND OUTRO (12.0s - 16.0s)
-    // "iLoveSwap — Selesai sebelum deadline."
+    // "iLoveSwap — Done in 3 seconds before your deadline."
     // ==========================================
-    // Document and texts zoom out / disappear into center
     tl.to([headlineBox, targetBox], {
       opacity: 0,
       scale: 0.9,
@@ -922,7 +1130,7 @@
     tl.to(docWrapper, {
       opacity: 0,
       scale: 0.4,
-      rotationY: 45,
+      rotationY: 30,
       z: -400,
       duration: 0.8,
       ease: "power3.in"
@@ -939,8 +1147,8 @@
 
     // Brand Outro enters center stage
     tl.fromTo(brandClimax,
-      { opacity: 0, scale: 0.85, filter: "blur(14px)" },
-      { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.9, ease: "power3.out" },
+      { opacity: 0, scale: 0.88 },
+      { opacity: 1, scale: 1, duration: 0.9, ease: "power3.out" },
       12.4
     );
 
@@ -950,14 +1158,13 @@
       12.5
     );
 
-    // Hold climax till 15.2s, then seamless transition out for loop
+    // Hold climax till 15.3s, then seamless transition out for loop
     tl.to(brandClimax, {
       opacity: 0,
-      scale: 1.08,
-      filter: "blur(10px)",
-      duration: 0.7,
+      scale: 1.05,
+      duration: 0.6,
       ease: "power2.in"
-    }, 15.3);
+    }, 15.4);
 
     // Reset document state cleanly for seamless loop
     tl.add(() => {
@@ -978,21 +1185,53 @@
     }, 16.0);
 
     // ==========================================
-    // CONTROLS & INTERACTIVITY
+    // INTERACTIVITY & TOUCH CONTROLS
     // ==========================================
     if (isClean) {
       tl.pause();
     }
 
+    let toastTimer = null;
+    function showToast(msg) {
+      touchToast.textContent = msg;
+      touchToast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        touchToast.classList.remove('show');
+      }, 1000);
+    }
+
+    // Toggle play/pause on tap / click
+    stage.addEventListener('click', (e) => {
+      if (isDebug && e.target.closest('#debug-panel')) return;
+      if (tl.paused()) {
+        tl.play();
+        showToast('▶ Playing');
+      } else {
+        tl.pause();
+        showToast('⏸ Paused');
+      }
+      if (isDebug) {
+        document.getElementById('play-pause-btn').textContent = tl.paused() ? 'Play' : 'Pause';
+      }
+    });
+
     // Keyboard shortcuts
     window.addEventListener('keydown', (e) => {
       if (e.code === 'Space') {
-        tl.paused(!tl.paused());
+        if (tl.paused()) {
+          tl.play();
+          showToast('▶ Playing');
+        } else {
+          tl.pause();
+          showToast('⏸ Paused');
+        }
         if (isDebug) {
           document.getElementById('play-pause-btn').textContent = tl.paused() ? 'Play' : 'Pause';
         }
       } else if (e.code === 'KeyR') {
         tl.restart();
+        showToast('↺ Restarted');
       }
     });
 
@@ -1001,16 +1240,19 @@
       const restartBtn = document.getElementById('restart-btn');
       const scrubber = document.getElementById('time-scrubber');
 
-      playPauseBtn.addEventListener('click', () => {
+      playPauseBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
         tl.paused(!tl.paused());
         playPauseBtn.textContent = tl.paused() ? 'Play' : 'Pause';
       });
 
-      restartBtn.addEventListener('click', () => {
+      restartBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
         tl.restart();
       });
 
       scrubber.addEventListener('input', (e) => {
+        e.stopPropagation();
         tl.pause();
         tl.time(parseFloat(e.target.value));
         playPauseBtn.textContent = 'Play';
