@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>iLoveSwap — Cinematic Motion Intro</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    :root {
+      --bg: #070a12;
+      --bg-darker: #04060b;
+      --brand: #e5322d;
+      --brand-glow: rgba(229, 50, 45, 0.45);
+      --accent-blue: #3b82f6;
+      --accent-emerald: #10b981;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    body {
+      background: #000;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      color: var(--text-main);
+    }
+
+    /* Fixed 1920x1080 stage scaled responsively */
+    #stage-container {
+      width: 1920px;
+      height: 1080px;
+      position: relative;
+      overflow: hidden;
+      background: var(--bg);
+      transform-origin: center center;
+      box-shadow: 0 0 100px rgba(0,0,0,0.8);
+    }
+
+    /* Ambient dynamic background */
+    .bg-layer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .bg-grid {
+      background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      background-position: center center;
+    }
+
+    .bg-glow-orb {
+      position: absolute;
+      width: 900px;
+      height: 900px;
+      border-radius: 50%;
+      filter: blur(140px);
+      opacity: 0.18;
+      pointer-events: none;
+    }
+
+    .orb-red {
+      top: -200px;
+      right: -150px;
+      background: radial-gradient(circle, var(--brand) 0%, transparent 70%);
+    }
+
+    .orb-blue {
+      bottom: -250px;
+      left: -200px;
+      background: radial-gradient(circle, var(--accent-blue) 0%, transparent 70%);
+    }
+
+    .grain {
+      position: absolute;
+      inset: 0;
+      opacity: 0.04;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    }
+
+    /* 3D Camera Rig */
+    #viewport {
+      position: absolute;
+      inset: 0;
+      perspective: 1200px;
+      overflow: hidden;
+    }
+
+    #world {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      will-change: transform;
+    }
+
+    /* Cinematic Letterbox Masking */
+    .cinema-bar {
+      position: absolute;
+      left: 0;
+      width: 100%;
+      height: 48px;
+      background: #030408;
+      z-index: 100;
+    }
+    .cinema-bar.top { top: 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .cinema-bar.bottom { bottom: 0; border-top: 1px solid rgba(255,255,255,0.05); }
+
+    .header-hud {
+      position: absolute;
+      top: 14px;
+      left: 60px;
+      right: 60px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: var(--text-muted);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      z-index: 101;
+    }
+
+    .hud-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .hud-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--brand);
+      box-shadow: 0 0 10px var(--brand);
+    }
+
+    /* Typography & Claims */
+    .headline-container {
+      position: absolute;
+      left: 120px;
+      top: 180px;
+      max-width: 800px;
+      z-index: 20;
+    }
+
+    .kicker {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--brand);
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .kicker-line {
+      width: 32px;
+      height: 2px;
+      background: var(--brand);
+    }
+
+    .claim-text {
+      font-size: 64px;
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -1.5px;
+      color: #ffffff;
+      margin-bottom: 24px;
+    }
+
+    .claim-text .accent-red {
+      color: var(--brand);
+      text-shadow: 0 0 35px var(--brand-glow);
+    }
+
+    .claim-text .accent-emerald {
+      color: var(--accent-emerald);
+      text-shadow: 0 0 35px rgba(16, 185, 129, 0.4);
+    }
+
+    .sub-tagline {
+      font-size: 24px;
+      font-weight: 500;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* 3D Lab Manual Document */
+    .doc-3d-wrapper {
+      position: absolute;
+      right: 140px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 600px;
+      height: 780px;
+      transform-style: preserve-3d;
+      perspective: 1000px;
+    }
+
+    .doc-card {
+      width: 100%;
+      height: 100%;
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 
+        0 35px 80px rgba(0, 0, 0, 0.7),
+        0 0 60px rgba(229, 50, 45, 0.15);
+      color: #1e293b;
+      padding: 44px 48px;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.4);
+    }
+
+    /* Document Internal Academic Styling */
+    .doc-header {
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 20px;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+
+    .doc-inst {
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #0f172a;
+    }
+
+    .doc-dept {
+      font-size: 12px;
+      font-weight: 600;
+      color: #64748b;
+      margin-top: 4px;
+    }
+
+    .doc-aim-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--brand);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 14px;
+    }
+
+    .doc-aim-text {
+      font-size: 13px;
+      color: #475569;
+      line-height: 1.4;
+      margin-top: 4px;
+    }
+
+    /* Student Identity Table (Target Fields) */
+    .identity-table {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      position: relative;
+    }
+
+    .identity-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px dashed #cbd5e1;
+      font-size: 14px;
+    }
+    .identity-row:last-child {
+      border-bottom: none;
+    }
+
+    .id-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 600;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .id-value-box {
+      position: relative;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+    }
+
+    .id-value-box.old {
+      background: #fee2e2;
+      color: #991b1b;
+      text-decoration: line-through;
+    }
+
+    .id-value-box.new {
+      background: #dcfce7;
+      color: #166534;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 0 16px rgba(16, 185, 129, 0.3);
+    }
+
+    /* Mock code & conclusion content in document */
+    .mock-code {
+      background: #0f172a;
+      border-radius: 6px;
+      padding: 16px;
+      color: #94a3b8;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .mock-code span.kw { color: #f43f5e; }
+    .mock-code span.fn { color: #38bdf8; }
+    .mock-code span.str { color: #a3e635; }
+
+    .doc-stamp {
+      position: absolute;
+      right: 36px;
+      bottom: 36px;
+      width: 110px;
+      height: 110px;
+      border: 3px dashed var(--accent-emerald);
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-emerald);
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 800;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transform: rotate(-14deg);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* Laser Scanner Beam */
+    .laser-scanner {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, transparent, #e5322d 20%, #ff5252 50%, #e5322d 80%, transparent);
+      box-shadow: 0 0 20px 6px rgba(229, 50, 45, 0.85);
+      z-index: 50;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* HUD Reticle Target Box */
+    .hud-target-box {
+      position: absolute;
+      border: 2px solid var(--brand);
+      background: rgba(229, 50, 45, 0.08);
+      border-radius: 6px;
+      pointer-events: none;
+      opacity: 0;
+      z-index: 40;
+    }
+
+    .hud-target-tag {
+      position: absolute;
+      top: -22px;
+      left: 0;
+      background: var(--brand);
+      color: #ffffff;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 3px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* Final Climax Brand Center */
+    .brand-climax {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 60;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .brand-logo-icon {
+      width: 140px;
+      height: 140px;
+      border-radius: 32px;
+      background: linear-gradient(135deg, #e5322d 0%, #b31217 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 
+        0 25px 60px rgba(229, 50, 45, 0.5),
+        0 0 0 1px rgba(255, 255, 255, 0.2);
+      margin-bottom: 30px;
+      position: relative;
+    }
+
+    .brand-logo-icon svg {
+      width: 76px;
+      height: 76px;
+      fill: none;
+      stroke: #ffffff;
+      stroke-width: 2.5;
+    }
+
+    .brand-title {
+      font-size: 88px;
+      font-weight: 800;
+      letter-spacing: -2px;
+      color: #ffffff;
+      margin-bottom: 14px;
+    }
+
+    .brand-title span {
+      color: var(--brand);
+      text-shadow: 0 0 40px var(--brand-glow);
+    }
+
+    .brand-subtitle {
+      font-size: 26px;
+      font-weight: 500;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
+      margin-bottom: 36px;
+    }
+
+    .brand-url-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 12px 28px;
+      border-radius: 999px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 16px;
+      color: #ffffff;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
+
+    .brand-url-pill .url-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--accent-emerald);
+      box-shadow: 0 0 12px var(--accent-emerald);
+    }
+
+    /* Scrub Bar for ?debug=1 */
+    #debug-panel {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(10, 15, 26, 0.95);
+      border-top: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 12px 24px;
+      display: none;
+      align-items: center;
+      gap: 20px;
+      z-index: 1000;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+    }
+
+    #debug-panel input[type="range"] {
+      flex: 1;
+      accent-color: var(--brand);
+      cursor: pointer;
+    }
+
+    .debug-btn {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #ffffff;
+      padding: 6px 14px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="stage-container">
+    <!-- Letterbox Bars -->
+    <div class="cinema-bar top"></div>
+    <div class="cinema-bar bottom"></div>
+
+    <div class="header-hud">
+      <div class="hud-badge">
+        <span class="hud-dot"></span>
+        <span>iLoveSwap // System V1.0</span>
+      </div>
+      <div>SEC_BIFURCATOR: ACTIVE</div>
+      <div id="time-code">00:00:00</div>
+    </div>
+
+    <!-- Background Rich Layers -->
+    <div class="bg-layer bg-grid"></div>
+    <div class="bg-glow-orb orb-red"></div>
+    <div class="bg-glow-orb orb-blue"></div>
+    <div class="grain"></div>
+
+    <!-- 3D Camera Rig Viewport -->
+    <div id="viewport">
+      <div id="world">
+
+        <!-- Scene 1 & 2 Text Container -->
+        <div class="headline-container" id="headline-box">
+          <div class="kicker" id="kicker-el">
+            <span class="kicker-line"></span>
+            <span id="kicker-text">Smart Academic Engine</span>
+          </div>
+
+          <h1 class="claim-text" id="claim-el">
+            Lab manual teman,<br>
+            <span class="accent-red">identitas kamu.</span>
+          </h1>
+
+          <p class="sub-tagline" id="subtag-el">
+            Deteksi seksi otomatis, isolasi tag identitas, dan ganti nama tanpa merusak format berkas.
+          </p>
+        </div>
+
+        <!-- 3D Lab Manual Document -->
+        <div class="doc-3d-wrapper" id="doc-wrapper">
+          <div class="doc-card" id="doc-card">
+            
+            <!-- Laser Scanning Beam -->
+            <div class="laser-scanner" id="scanner-line"></div>
+
+            <!-- Target HUD Bounding Box -->
+            <div class="hud-target-box" id="target-box">
+              <span class="hud-target-tag">TARGET_IDENT: DETECTED</span>
+            </div>
+
+            <!-- Document Content -->
+            <div class="doc-header">
+              <div class="doc-inst">Department of Computer Engineering</div>
+              <div class="doc-dept">ADVANCED OPERATING SYSTEMS LAB MANUAL</div>
+              <div class="doc-aim-title">EXPERIMENT NO. 04</div>
+              <div class="doc-aim-text">Aim: Implementation of multi-threaded process synchronization using mutex locks and condition semaphores.</div>
+            </div>
+
+            <!-- Target Student Details Table -->
+            <div class="identity-table" id="ident-table">
+              <div class="identity-row">
+                <span class="id-label">Student Name</span>
+                <span class="id-value-box old" id="name-box">Rahul S. Verma</span>
+              </div>
+              <div class="identity-row">
+                <span class="id-label">Roll Number</span>
+                <span class="id-value-box old" id="roll-box">42</span>
+              </div>
+              <div class="identity-row">
+                <span class="id-label">Batch & Div</span>
+                <span class="id-value-box old" id="batch-box">B3 / D15</span>
+              </div>
+              <div class="identity-row">
+                <span class="id-label">PRN Code</span>
+                <span class="id-value-box old" id="prn-box">2021010488</span>
+              </div>
+            </div>
+
+            <!-- Mock Code Implementation -->
+            <div class="mock-code">
+              <div><span class="kw">#include</span> &lt;pthread.h&gt;</div>
+              <div><span class="kw">pthread_mutex_t</span> lock;</div>
+              <div><span class="kw">void*</span> <span class="fn">processTask</span>(<span class="kw">void*</span> arg) {</div>
+              <div>&nbsp;&nbsp;<span class="fn">pthread_mutex_lock</span>(&amp;lock);</div>
+              <div>&nbsp;&nbsp;<span class="str">// Execute protected critical section</span></div>
+              <div>&nbsp;&nbsp;<span class="fn">pthread_mutex_unlock</span>(&amp;lock);</div>
+              <div>}</div>
+            </div>
+
+            <!-- Verified Stamp -->
+            <div class="doc-stamp" id="doc-stamp">
+              <span>Verified</span>
+              <span style="font-size:16px;">✓</span>
+              <span>iLoveSwap</span>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Climax Outro Logo -->
+        <div class="brand-climax" id="brand-climax">
+          <div class="brand-logo-icon" id="logo-icon">
+            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+          </div>
+
+          <h2 class="brand-title">iLove<span>Swap</span></h2>
+          <p class="brand-subtitle">Selesai dalam 3 detik sebelum deadline.</p>
+
+          <div class="brand-url-pill">
+            <span class="url-dot"></span>
+            <span>scamyyy.vercel.app</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Debug Scrubber (?debug=1) -->
+  <div id="debug-panel">
+    <button class="debug-btn" id="play-pause-btn">Pause</button>
+    <button class="debug-btn" id="restart-btn">Restart (R)</button>
+    <input type="range" id="time-scrubber" min="0" max="16" step="0.01" value="0">
+    <span id="debug-time">0.00s / 16.00s</span>
+  </div>
+
+  <!-- GSAP CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script>
+    // Scale stage responsively to fit 1920x1080 into any screen
+    function resizeStage() {
+      const stage = document.getElementById('stage-container');
+      const scaleX = window.innerWidth / 1920;
+      const scaleY = window.innerHeight / 1080;
+      const scale = Math.min(scaleX, scaleY);
+      stage.style.transform = `scale(${scale})`;
+    }
+    window.addEventListener('resize', resizeStage);
+    resizeStage();
+
+    // Check debug mode
+    const urlParams = new URLSearchParams(window.location.search);
+    const isDebug = urlParams.get('debug') === '1';
+    const isClean = urlParams.get('clean') === '1';
+
+    if (isDebug) {
+      document.getElementById('debug-panel').style.display = 'flex';
+    }
+
+    // Elements
+    const world = document.getElementById('world');
+    const headlineBox = document.getElementById('headline-box');
+    const kickerEl = document.getElementById('kicker-el');
+    const kickerText = document.getElementById('kicker-text');
+    const claimEl = document.getElementById('claim-el');
+    const subtagEl = document.getElementById('subtag-el');
+    const docWrapper = document.getElementById('doc-wrapper');
+    const docCard = document.getElementById('doc-card');
+    const scannerLine = document.getElementById('scanner-line');
+    const targetBox = document.getElementById('target-box');
+    const identTable = document.getElementById('ident-table');
+    const nameBox = document.getElementById('name-box');
+    const rollBox = document.getElementById('roll-box');
+    const batchBox = document.getElementById('batch-box');
+    const prnBox = document.getElementById('prn-box');
+    const docStamp = document.getElementById('doc-stamp');
+    const brandClimax = document.getElementById('brand-climax');
+    const timeCode = document.getElementById('time-code');
+
+    // Master Timeline (16.0 Seconds Duration)
+    const tl = gsap.timeline({
+      repeat: -1,
+      onUpdate: () => {
+        const t = tl.time();
+        const m = Math.floor(t / 60).toString().padStart(2, '0');
+        const s = Math.floor(t % 60).toString().padStart(2, '0');
+        const ms = Math.floor((t % 1) * 100).toString().padStart(2, '0');
+        timeCode.textContent = `${m}:${s}:${ms}`;
+
+        if (isDebug) {
+          document.getElementById('time-scrubber').value = t;
+          document.getElementById('debug-time').textContent = `${t.toFixed(2)}s / 16.00s`;
+        }
+      }
+    });
+
+    // Initial 3D States
+    gsap.set(world, { transformOrigin: "50% 50% -300px" });
+    gsap.set(docWrapper, { 
+      rotationY: -18,
+      rotationX: 10,
+      rotationZ: 3,
+      z: -100
+    });
+    gsap.set(scannerLine, { top: "5%" });
+    gsap.set(targetBox, { opacity: 0 });
+
+    // ==========================================
+    // ACT 1: THE HOOK (0.0s - 4.0s)
+    // "Lab manual teman, identitas kamu."
+    // ==========================================
+    tl.fromTo(headlineBox, 
+      { opacity: 0, x: -60, filter: "blur(12px)" },
+      { opacity: 1, x: 0, filter: "blur(0px)", duration: 1.0, ease: "power3.out" },
+      0.2
+    );
+
+    tl.fromTo(docWrapper,
+      { opacity: 0, scale: 0.85, x: 120, rotationY: -35 },
+      { opacity: 1, scale: 1, x: 0, rotationY: -18, duration: 1.4, ease: "power2.out" },
+      0.3
+    );
+
+    // Subtle breathing camera drift
+    tl.to(world, {
+      z: 50,
+      rotationY: 3,
+      duration: 3.5,
+      ease: "sine.inOut"
+    }, 0);
+
+    // ==========================================
+    // ACT 2: SURGICAL SCANNING (4.0s - 7.5s)
+    // "Satu klik, semua tag terdeteksi."
+    // ==========================================
+    tl.to(headlineBox, {
+      opacity: 0,
+      x: -40,
+      filter: "blur(8px)",
+      duration: 0.6,
+      ease: "power2.in"
+    }, 3.8);
+
+    tl.add(() => {
+      kickerText.textContent = "Autonomous Tag Isolation";
+      claimEl.innerHTML = `Satu klik,<br><span class="accent-red">semua field terkunci.</span>`;
+      subtagEl.textContent = "AI mendeteksi Name, Roll No, Batch, dan PRN langsung pada kanvas dokumen.";
+    }, 4.4);
+
+    tl.to(headlineBox, {
+      opacity: 1,
+      x: 0,
+      filter: "blur(0px)",
+      duration: 0.8,
+      ease: "power3.out"
+    }, 4.5);
+
+    // Camera zooms closer toward the document
+    tl.to(world, {
+      z: 220,
+      x: -120,
+      rotationY: -6,
+      duration: 3.5,
+      ease: "power2.inOut"
+    }, 4.0);
+
+    // Laser scan beam sweeps downward
+    tl.to(scannerLine, {
+      opacity: 1,
+      duration: 0.3
+    }, 4.2);
+
+    tl.to(scannerLine, {
+      top: "85%",
+      duration: 2.2,
+      ease: "power1.inOut"
+    }, 4.5);
+
+    // Target box locks over Identity Table
+    const tableOffsetTop = 155;
+    const tableOffsetHeight = 160;
+    tl.set(targetBox, {
+      top: tableOffsetTop + "px",
+      left: "40px",
+      right: "40px",
+      height: tableOffsetHeight + "px"
+    }, 5.2);
+
+    tl.fromTo(targetBox,
+      { opacity: 0, scale: 1.08 },
+      { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(2)" },
+      5.3
+    );
+
+    tl.to(scannerLine, { opacity: 0, duration: 0.3 }, 6.7);
+
+    // ==========================================
+    // ACT 3: THE LIVE SWAP & WHITEOUT (7.5s - 12.0s)
+    // "Whiteout presisi tanpa merusak format."
+    // ==========================================
+    tl.to(headlineBox, {
+      opacity: 0,
+      x: -40,
+      filter: "blur(8px)",
+      duration: 0.5,
+      ease: "power2.in"
+    }, 7.5);
+
+    tl.add(() => {
+      kickerText.textContent = "Lossless In-Place Replacement";
+      claimEl.innerHTML = `Identitas kamu,<br><span class="accent-emerald">langsung terverifikasi.</span>`;
+      subtagEl.textContent = "Font match presisi, tabel Word 100% utuh, tanpa meninggalkan jejak revisi.";
+    }, 8.0);
+
+    tl.to(headlineBox, {
+      opacity: 1,
+      x: 0,
+      filter: "blur(0px)",
+      duration: 0.8,
+      ease: "power3.out"
+    }, 8.1);
+
+    // Dramatic close-up on the Identity fields
+    tl.to(world, {
+      z: 380,
+      x: -280,
+      y: -20,
+      rotationY: 2,
+      duration: 3.5,
+      ease: "power2.out"
+    }, 7.8);
+
+    // Swap fields one by one with punchy stamps
+    tl.add(() => {
+      nameBox.className = "id-value-box new";
+      nameBox.innerHTML = `Om Bhalerao <span style="font-size:12px;">✓</span>`;
+    }, 8.4);
+
+    tl.fromTo(nameBox, 
+      { scale: 1.35, filter: "brightness(2)" },
+      { scale: 1, filter: "brightness(1)", duration: 0.35, ease: "back.out(2.5)" },
+      8.4
+    );
+
+    tl.add(() => {
+      rollBox.className = "id-value-box new";
+      rollBox.innerHTML = `18 <span style="font-size:12px;">✓</span>`;
+    }, 8.8);
+
+    tl.fromTo(rollBox, 
+      { scale: 1.35, filter: "brightness(2)" },
+      { scale: 1, filter: "brightness(1)", duration: 0.35, ease: "back.out(2.5)" },
+      8.8
+    );
+
+    tl.add(() => {
+      batchBox.className = "id-value-box new";
+      batchBox.innerHTML = `A1 / D10 <span style="font-size:12px;">✓</span>`;
+    }, 9.2);
+
+    tl.fromTo(batchBox, 
+      { scale: 1.35, filter: "brightness(2)" },
+      { scale: 1, filter: "brightness(1)", duration: 0.35, ease: "back.out(2.5)" },
+      9.2
+    );
+
+    tl.add(() => {
+      prnBox.className = "id-value-box new";
+      prnBox.innerHTML = `2023020018 <span style="font-size:12px;">✓</span>`;
+    }, 9.6);
+
+    tl.fromTo(prnBox, 
+      { scale: 1.35, filter: "brightness(2)" },
+      { scale: 1, filter: "brightness(1)", duration: 0.35, ease: "back.out(2.5)" },
+      9.6
+    );
+
+    // Target box turns emerald success
+    tl.to(targetBox, {
+      borderColor: "var(--accent-emerald)",
+      backgroundColor: "rgba(16, 185, 129, 0.08)",
+      duration: 0.4
+    }, 9.7);
+
+    // Approved Stamp hits the document
+    tl.fromTo(docStamp,
+      { opacity: 0, scale: 2.2, rotation: -40 },
+      { opacity: 1, scale: 1, rotation: -14, duration: 0.5, ease: "back.out(2)" },
+      10.2
+    );
+
+    // ==========================================
+    // ACT 4: CLIMAX & BRAND OUTRO (12.0s - 16.0s)
+    // "iLoveSwap — Selesai sebelum deadline."
+    // ==========================================
+    // Document and texts zoom out / disappear into center
+    tl.to([headlineBox, targetBox], {
+      opacity: 0,
+      scale: 0.9,
+      duration: 0.5,
+      ease: "power2.in"
+    }, 11.8);
+
+    tl.to(docWrapper, {
+      opacity: 0,
+      scale: 0.4,
+      rotationY: 45,
+      z: -400,
+      duration: 0.8,
+      ease: "power3.in"
+    }, 11.9);
+
+    tl.to(world, {
+      z: 0,
+      x: 0,
+      y: 0,
+      rotationY: 0,
+      duration: 1.0,
+      ease: "power3.inOut"
+    }, 12.0);
+
+    // Brand Outro enters center stage
+    tl.fromTo(brandClimax,
+      { opacity: 0, scale: 0.85, filter: "blur(14px)" },
+      { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.9, ease: "power3.out" },
+      12.4
+    );
+
+    tl.fromTo("#logo-icon",
+      { rotation: -20, scale: 0.7 },
+      { rotation: 0, scale: 1, duration: 0.8, ease: "back.out(2)" },
+      12.5
+    );
+
+    // Hold climax till 15.2s, then seamless transition out for loop
+    tl.to(brandClimax, {
+      opacity: 0,
+      scale: 1.08,
+      filter: "blur(10px)",
+      duration: 0.7,
+      ease: "power2.in"
+    }, 15.3);
+
+    // Reset document state cleanly for seamless loop
+    tl.add(() => {
+      nameBox.className = "id-value-box old";
+      nameBox.textContent = "Rahul S. Verma";
+      rollBox.className = "id-value-box old";
+      rollBox.textContent = "42";
+      batchBox.className = "id-value-box old";
+      batchBox.textContent = "B3 / D15";
+      prnBox.className = "id-value-box old";
+      prnBox.textContent = "2021010488";
+      targetBox.style.borderColor = "var(--brand)";
+      targetBox.style.backgroundColor = "rgba(229, 50, 45, 0.08)";
+      docStamp.style.opacity = "0";
+      kickerText.textContent = "Smart Academic Engine";
+      claimEl.innerHTML = `Lab manual teman,<br><span class="accent-red">identitas kamu.</span>`;
+      subtagEl.textContent = "Deteksi seksi otomatis, isolasi tag identitas, dan ganti nama tanpa merusak format berkas.";
+    }, 16.0);
+
+    // ==========================================
+    // CONTROLS & INTERACTIVITY
+    // ==========================================
+    if (isClean) {
+      tl.pause();
+    }
+
+    // Keyboard shortcuts
+    window.addEventListener('keydown', (e) => {
+      if (e.code === 'Space') {
+        tl.paused(!tl.paused());
+        if (isDebug) {
+          document.getElementById('play-pause-btn').textContent = tl.paused() ? 'Play' : 'Pause';
+        }
+      } else if (e.code === 'KeyR') {
+        tl.restart();
+      }
+    });
+
+    if (isDebug) {
+      const playPauseBtn = document.getElementById('play-pause-btn');
+      const restartBtn = document.getElementById('restart-btn');
+      const scrubber = document.getElementById('time-scrubber');
+
+      playPauseBtn.addEventListener('click', () => {
+        tl.paused(!tl.paused());
+        playPauseBtn.textContent = tl.paused() ? 'Play' : 'Pause';
+      });
+
+      restartBtn.addEventListener('click', () => {
+        tl.restart();
+      });
+
+      scrubber.addEventListener('input', (e) => {
+        tl.pause();
+        tl.time(parseFloat(e.target.value));
+        playPauseBtn.textContent = 'Play';
+      });
+    }
+  </script>
+</body>
+</html>
