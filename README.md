@@ -1,5 +1,8 @@
 # iLoveSwap - Smart Document Section Bifurcator & Identity Editor
 
+> 🌐 **Live Web Application:** [https://scamyyy.vercel.app](https://scamyyy.vercel.app)  
+> 🎬 **Cinematic Motion Intro:** [https://scamyyy.vercel.app/intro](https://scamyyy.vercel.app/intro)
+
 A high-performance web application and Chrome Extension designed for academic reports, lab manuals, and assignments. Automatically parses PDF and Microsoft Word (`.docx`) documents into semantic sections, isolates student identity tags (Name, Roll No, Batch, Division, PRN), enables direct on-page editing or line removal, and exports to customized PDF, Word, or ZIP packages.
 
 ---

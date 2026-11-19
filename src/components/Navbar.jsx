@@ -1,5 +1,5 @@
 import React from 'react';
-import { RefreshCw, Puzzle, Shield } from 'lucide-react';
+import { RefreshCw, Puzzle, Shield, Play } from 'lucide-react';
 
 export default function Navbar({
   onReset,
@@ -48,6 +48,16 @@ export default function Navbar({
               <span>Reset</span>
             </button>
           )}
+
+          <a
+            href="/intro"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-red-50 text-red-600 border border-red-200 rounded font-medium hover:bg-red-100 transition-colors"
+          >
+            <Play className="w-3.5 h-3.5 fill-red-600" />
+            <span>Intro</span>
+          </a>
 
           <button
             onClick={onOpenGuide}
