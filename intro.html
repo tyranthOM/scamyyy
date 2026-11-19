@@ -17,12 +17,13 @@
     }
 
     :root {
-      --bg: #070a12;
-      --bg-darker: #04060b;
+      --bg: #060911;
+      --bg-darker: #030509;
       --brand: #e5322d;
-      --brand-glow: rgba(229, 50, 45, 0.45);
+      --brand-glow: rgba(229, 50, 45, 0.5);
       --accent-blue: #3b82f6;
       --accent-emerald: #10b981;
+      --emerald-glow: rgba(16, 185, 129, 0.45);
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
     }
@@ -40,13 +41,26 @@
       color: var(--text-main);
     }
 
+    /* Minimal Timeline Progress Line at top */
+    #timeline-progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 3px;
+      width: 0%;
+      background: linear-gradient(90deg, var(--brand), #ff4d4d, var(--accent-emerald));
+      z-index: 1000;
+      box-shadow: 0 0 10px var(--brand);
+      pointer-events: none;
+    }
+
     /* Fixed master stage scaled dynamically based on screen orientation */
     #stage-container {
       position: relative;
       overflow: hidden;
       background: var(--bg);
       transform-origin: center center;
-      box-shadow: 0 0 100px rgba(0,0,0,0.9);
+      box-shadow: 0 0 120px rgba(0,0,0,0.95);
       cursor: pointer;
     }
 
@@ -79,12 +93,12 @@
 
     .bg-glow-orb {
       position: absolute;
-      width: 900px;
-      height: 900px;
+      width: 950px;
+      height: 950px;
       border-radius: 50%;
-      filter: blur(120px);
-      -webkit-filter: blur(120px);
-      opacity: 0.22;
+      filter: blur(140px);
+      -webkit-filter: blur(140px);
+      opacity: 0.24;
       pointer-events: none;
       transform: translate3d(0,0,0);
     }
@@ -126,7 +140,7 @@
       will-change: transform;
     }
 
-    /* Cinema HUD bar */
+    /* Cinema Letterbox Bars */
     .cinema-bar {
       position: absolute;
       left: 0;
@@ -157,14 +171,43 @@
     .hud-badge {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
     }
     .hud-dot {
-      width: 8px;
-      height: 8px;
+      width: 9px;
+      height: 9px;
       border-radius: 50%;
       background: var(--brand);
-      box-shadow: 0 0 10px var(--brand);
+      box-shadow: 0 0 12px var(--brand);
+      animation: pulseDot 2s infinite ease-in-out;
+    }
+    @keyframes pulseDot {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.3); opacity: 0.6; }
+    }
+
+    /* Sound Pill Switch in Header */
+    .sound-toggle-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      padding: 4px 12px;
+      border-radius: 999px;
+      cursor: pointer;
+      color: #ffffff;
+      font-size: 12px;
+      transition: all 0.2s ease;
+    }
+    .sound-toggle-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: var(--brand);
+    }
+    .sound-toggle-btn.active {
+      background: rgba(229, 50, 45, 0.2);
+      border-color: var(--brand);
+      color: #ff8080;
     }
 
     /* Typography & Claims */
@@ -174,7 +217,6 @@
       transition: all 0.3s ease;
     }
 
-    /* Landscape Layout */
     .landscape .headline-container {
       left: 120px;
       top: 180px;
@@ -182,7 +224,6 @@
       text-align: left;
     }
 
-    /* Portrait Mobile Layout */
     .portrait .headline-container {
       left: 60px;
       right: 60px;
@@ -209,9 +250,10 @@
     }
 
     .kicker-line {
-      width: 32px;
-      height: 2px;
+      width: 36px;
+      height: 3px;
       background: var(--brand);
+      border-radius: 2px;
     }
 
     .claim-text {
@@ -235,7 +277,7 @@
 
     .claim-text .accent-emerald {
       color: var(--accent-emerald);
-      text-shadow: 0 0 35px rgba(16, 185, 129, 0.45);
+      text-shadow: 0 0 35px var(--emerald-glow);
     }
 
     .sub-tagline {
@@ -255,7 +297,7 @@
     .doc-3d-wrapper {
       position: absolute;
       transform-style: preserve-3d;
-      perspective: 1000px;
+      perspective: 1200px;
       will-change: transform;
     }
 
@@ -264,7 +306,7 @@
       top: 50%;
       transform: translateY(-50%);
       width: 600px;
-      height: 780px;
+      height: 790px;
     }
 
     .portrait .doc-3d-wrapper {
@@ -281,8 +323,8 @@
       background: #ffffff;
       border-radius: 14px;
       box-shadow: 
-        0 40px 90px rgba(0, 0, 0, 0.75),
-        0 0 60px rgba(229, 50, 45, 0.15);
+        0 45px 100px rgba(0, 0, 0, 0.8),
+        0 0 70px rgba(229, 50, 45, 0.16);
       color: #1e293b;
       padding: 44px 48px;
       position: relative;
@@ -294,16 +336,69 @@
       border-radius: 20px;
     }
 
+    /* Specular Surface Light Sweep across Document */
+    .doc-specular-sweep {
+      position: absolute;
+      top: -100%;
+      left: -100%;
+      width: 300%;
+      height: 300%;
+      background: linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.25) 50%, transparent 60%);
+      transform: rotate(25deg);
+      pointer-events: none;
+      z-index: 45;
+      opacity: 0;
+    }
+
+    /* Academic Seal Watermark in Document */
+    .doc-watermark {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 360px;
+      height: 360px;
+      border: 8px solid rgba(15, 23, 42, 0.035);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      color: rgba(15, 23, 42, 0.04);
+    }
+
     /* Document Internal Academic Styling */
     .doc-header {
       border-bottom: 2px solid #e2e8f0;
       padding-bottom: 20px;
       margin-bottom: 24px;
-      text-align: center;
+      position: relative;
     }
     .portrait .doc-header {
       padding-bottom: 28px;
       margin-bottom: 32px;
+    }
+
+    .doc-barcode {
+      position: absolute;
+      top: 0;
+      right: 0;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: #94a3b8;
+      letter-spacing: 1px;
+      text-align: right;
+    }
+    .barcode-lines {
+      height: 18px;
+      width: 68px;
+      background: repeating-linear-gradient(90deg, #1e293b 0, #1e293b 2px, transparent 2px, transparent 4px, #1e293b 4px, #1e293b 5px, transparent 5px, transparent 8px);
+      margin-top: 2px;
     }
 
     .doc-inst {
@@ -389,7 +484,7 @@
       font-weight: 700;
       font-family: 'JetBrains Mono', monospace;
       font-size: 14px;
-      transition: background-color 0.2s;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .portrait .id-value-box {
       font-size: 18px;
@@ -409,7 +504,7 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      box-shadow: 0 0 16px rgba(16, 185, 129, 0.35);
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
     }
 
     /* Mock code & conclusion content in document */
@@ -455,6 +550,7 @@
       transform: rotate(-14deg);
       opacity: 0;
       pointer-events: none;
+      box-shadow: inset 0 0 15px rgba(16, 185, 129, 0.2);
     }
     .portrait .doc-stamp {
       width: 160px;
@@ -464,20 +560,20 @@
       font-size: 15px;
     }
 
-    /* Laser Scanner Beam */
+    /* Laser Scanner Beam with Particle Glow */
     .laser-scanner {
       position: absolute;
       left: 0;
       right: 0;
       height: 4px;
       background: linear-gradient(90deg, transparent, #e5322d 20%, #ff5252 50%, #e5322d 80%, transparent);
-      box-shadow: 0 0 20px 6px rgba(229, 50, 45, 0.85);
+      box-shadow: 0 0 24px 8px rgba(229, 50, 45, 0.95);
       z-index: 50;
       opacity: 0;
       pointer-events: none;
     }
 
-    /* HUD Reticle Target Box */
+    /* HUD Reticle Target Box with Corner Brackets */
     .hud-target-box {
       position: absolute;
       border: 2px solid var(--brand);
@@ -487,6 +583,19 @@
       opacity: 0;
       z-index: 40;
     }
+
+    .hud-corner {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border-color: var(--brand);
+      border-style: solid;
+      pointer-events: none;
+    }
+    .hud-corner.tl { top: -2px; left: -2px; border-width: 3px 0 0 3px; }
+    .hud-corner.tr { top: -2px; right: -2px; border-width: 3px 3px 0 0; }
+    .hud-corner.bl { bottom: -2px; left: -2px; border-width: 0 0 3px 3px; }
+    .hud-corner.br { bottom: -2px; right: -2px; border-width: 0 3px 3px 0; }
 
     .hud-target-tag {
       position: absolute;
@@ -532,9 +641,10 @@
       align-items: center;
       justify-content: center;
       box-shadow: 
-        0 25px 60px rgba(229, 50, 45, 0.5),
-        0 0 0 1px rgba(255, 255, 255, 0.2);
+        0 25px 60px rgba(229, 50, 45, 0.55),
+        0 0 0 1px rgba(255, 255, 255, 0.25);
       margin-bottom: 28px;
+      position: relative;
     }
     .portrait .brand-logo-icon {
       width: 180px;
@@ -570,7 +680,7 @@
 
     .brand-title span {
       color: var(--brand);
-      text-shadow: 0 0 40px var(--brand-glow);
+      text-shadow: 0 0 45px var(--brand-glow);
     }
 
     .brand-subtitle {
@@ -586,22 +696,35 @@
       line-height: 1.4;
     }
 
+    .brand-action-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      pointer-events: auto;
+    }
+
     .brand-url-pill {
       display: inline-flex;
       align-items: center;
       gap: 12px;
       background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.16);
       padding: 12px 28px;
       border-radius: 999px;
       font-family: 'JetBrains Mono', monospace;
       font-size: 18px;
       color: #ffffff;
       box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+      text-decoration: none;
+      transition: all 0.2s;
     }
     .portrait .brand-url-pill {
       font-size: 26px;
       padding: 18px 44px;
+    }
+    .brand-url-pill:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: var(--brand);
     }
 
     .brand-url-pill .url-dot {
@@ -610,6 +733,33 @@
       border-radius: 50%;
       background: var(--accent-emerald);
       box-shadow: 0 0 14px var(--accent-emerald);
+    }
+
+    .launch-app-btn {
+      background: var(--brand);
+      color: #ffffff;
+      border: none;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+      padding: 12px 28px;
+      border-radius: 999px;
+      cursor: pointer;
+      box-shadow: 0 10px 30px rgba(229, 50, 45, 0.4);
+      transition: all 0.2s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .portrait .launch-app-btn {
+      font-size: 24px;
+      padding: 18px 44px;
+    }
+    .launch-app-btn:hover {
+      background: #ff4742;
+      transform: translateY(-2px);
+      box-shadow: 0 15px 40px rgba(229, 50, 45, 0.6);
     }
 
     /* Floating Touch / Tap Status Pill */
@@ -621,9 +771,9 @@
       background: rgba(15, 23, 42, 0.88);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.16);
       color: #ffffff;
-      padding: 12px 24px;
+      padding: 12px 26px;
       border-radius: 999px;
       font-family: 'JetBrains Mono', monospace;
       font-size: 15px;
@@ -648,8 +798,8 @@
       right: 0;
       text-align: center;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
-      color: rgba(255, 255, 255, 0.4);
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.45);
       letter-spacing: 1px;
       text-transform: uppercase;
       z-index: 102;
@@ -691,6 +841,9 @@
 </head>
 <body>
 
+  <!-- Minimal Timeline Progress Bar at top -->
+  <div id="timeline-progress"></div>
+
   <!-- Touch Notification Indicator -->
   <div id="touch-toast">Paused</div>
 
@@ -704,7 +857,13 @@
         <span class="hud-dot"></span>
         <span>iLoveSwap // System V1.0</span>
       </div>
-      <div>SEC_BIFURCATOR: ACTIVE</div>
+      
+      <!-- Interactive Audio Synth Toggle -->
+      <button class="sound-toggle-btn" id="sound-btn" type="button">
+        <span id="sound-icon">🔈</span>
+        <span id="sound-text">Sound: Off</span>
+      </button>
+
       <div id="time-code">00:00:00</div>
     </div>
 
@@ -739,16 +898,30 @@
         <div class="doc-3d-wrapper" id="doc-wrapper">
           <div class="doc-card" id="doc-card">
             
+            <!-- Specular Light Sweep -->
+            <div class="doc-specular-sweep" id="doc-sweep"></div>
+
+            <!-- Watermark -->
+            <div class="doc-watermark">ACADEMIC // VERIFIED</div>
+
             <!-- Laser Scanning Beam -->
             <div class="laser-scanner" id="scanner-line"></div>
 
             <!-- Target HUD Bounding Box -->
             <div class="hud-target-box" id="target-box">
+              <span class="hud-corner tl"></span>
+              <span class="hud-corner tr"></span>
+              <span class="hud-corner bl"></span>
+              <span class="hud-corner br"></span>
               <span class="hud-target-tag">TARGET_IDENT: DETECTED</span>
             </div>
 
             <!-- Document Content -->
             <div class="doc-header">
+              <div class="doc-barcode">
+                <span>DOC_ID: 884-26</span>
+                <div class="barcode-lines"></div>
+              </div>
               <div class="doc-inst">Department of Computer Engineering</div>
               <div class="doc-dept">ADVANCED OPERATING SYSTEMS LAB MANUAL</div>
               <div class="doc-aim-title">EXPERIMENT NO. 04</div>
@@ -789,7 +962,7 @@
             <!-- Verified Stamp -->
             <div class="doc-stamp" id="doc-stamp">
               <span>Verified</span>
-              <span style="font-size:18px;">✓</span>
+              <span style="font-size:20px;">✓</span>
               <span>iLoveSwap</span>
             </div>
 
@@ -811,9 +984,15 @@
           <h2 class="brand-title">iLove<span>Swap</span></h2>
           <p class="brand-subtitle">Done in 3 seconds before your deadline.</p>
 
-          <div class="brand-url-pill">
-            <span class="url-dot"></span>
-            <span>scamyyy.vercel.app</span>
+          <div class="brand-action-row">
+            <a href="/" class="launch-app-btn">
+              <span>Launch App</span>
+              <span>→</span>
+            </a>
+            <a href="/" class="brand-url-pill">
+              <span class="url-dot"></span>
+              <span>scamyyy.vercel.app</span>
+            </a>
           </div>
         </div>
 
@@ -821,7 +1000,7 @@
     </div>
 
     <!-- Mobile interaction footer hint -->
-    <div class="mobile-hint">Tap anywhere to play / pause</div>
+    <div class="mobile-hint">Tap anywhere to play / pause · Audio toggle top-right</div>
   </div>
 
   <!-- Debug Scrubber (?debug=1) -->
@@ -844,6 +1023,7 @@
     const subtagEl = document.getElementById('subtag-el');
     const docWrapper = document.getElementById('doc-wrapper');
     const docCard = document.getElementById('doc-card');
+    const docSweep = document.getElementById('doc-sweep');
     const scannerLine = document.getElementById('scanner-line');
     const targetBox = document.getElementById('target-box');
     const identTable = document.getElementById('ident-table');
@@ -855,10 +1035,106 @@
     const brandClimax = document.getElementById('brand-climax');
     const timeCode = document.getElementById('time-code');
     const touchToast = document.getElementById('touch-toast');
+    const timelineProgress = document.getElementById('timeline-progress');
+    const soundBtn = document.getElementById('sound-btn');
+    const soundIcon = document.getElementById('sound-icon');
+    const soundText = document.getElementById('sound-text');
 
     let isPortraitMode = false;
+    let audioEnabled = false;
+    let audioCtx = null;
 
-    // Dynamically adapt stage to screen orientation
+    // ==========================================
+    // PROCEDURAL HIGH-TECH SOUND ENGINE (Web Audio API)
+    // ==========================================
+    function initAudio() {
+      if (!audioCtx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioContext();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function toggleSound(e) {
+      if (e) e.stopPropagation();
+      initAudio();
+      audioEnabled = !audioEnabled;
+      if (audioEnabled) {
+        soundBtn.classList.add('active');
+        soundIcon.textContent = '🔊';
+        soundText.textContent = 'Sound: On';
+        showToast('🔊 Audio Enabled');
+        playBeep(880, 0.1, 'sine');
+      } else {
+        soundBtn.classList.remove('active');
+        soundIcon.textContent = '🔈';
+        soundText.textContent = 'Sound: Off';
+        showToast('🔈 Audio Muted');
+      }
+    }
+    soundBtn.addEventListener('click', toggleSound);
+
+    // Sound FX generators
+    function playBeep(freq, duration = 0.08, type = 'sine', gainVal = 0.15) {
+      if (!audioEnabled || !audioCtx) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(gainVal, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (err) {}
+    }
+
+    function playLaserSweep() {
+      if (!audioEnabled || !audioCtx) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(1400, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(260, audioCtx.currentTime + 1.8);
+        gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.8);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 1.8);
+      } catch (err) {}
+    }
+
+    function playSubThud() {
+      if (!audioEnabled || !audioCtx) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(110, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(35, audioCtx.currentTime + 0.4);
+        gain.gain.setValueAtTime(0.35, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.4);
+
+        // Success harmonic chime
+        setTimeout(() => {
+          playBeep(987.77, 0.25, 'triangle', 0.12);
+        }, 80);
+      } catch (err) {}
+    }
+
+    // ==========================================
+    // RESPONSIVE STAGE SCALING
+    // ==========================================
     function updateResponsiveStage() {
       const w = window.innerWidth;
       const h = window.innerHeight;
@@ -881,10 +1157,9 @@
       const scale = Math.min(w / targetW, h / targetH);
       stage.style.transform = `scale(${scale})`;
 
-      // Adjust 3D camera angles slightly for mobile portrait
       if (isPortraitMode) {
         gsap.set(docWrapper, { 
-          rotationY: -8,
+          rotationY: -6,
           rotationX: 8,
           rotationZ: 1,
           z: -40
@@ -905,6 +1180,19 @@
     });
     updateResponsiveStage();
 
+    // Subtle pointer parallax effect
+    window.addEventListener('pointermove', (e) => {
+      const normX = (e.clientX / window.innerWidth - 0.5) * 2;
+      const normY = (e.clientY / window.innerHeight - 0.5) * 2;
+      gsap.to(world, {
+        rotationY: normX * 4,
+        rotationX: -normY * 3,
+        duration: 0.8,
+        ease: 'power2.out',
+        overwrite: 'auto'
+      });
+    });
+
     // Check debug mode
     const urlParams = new URLSearchParams(window.location.search);
     const isDebug = urlParams.get('debug') === '1';
@@ -919,6 +1207,10 @@
       repeat: -1,
       onUpdate: () => {
         const t = tl.time();
+        const totalDuration = 16.0;
+        const progressPct = (t / totalDuration) * 100;
+        timelineProgress.style.width = progressPct + '%';
+
         const m = Math.floor(t / 60).toString().padStart(2, '0');
         const s = Math.floor(t % 60).toString().padStart(2, '0');
         const ms = Math.floor((t % 1) * 100).toString().padStart(2, '0');
@@ -950,6 +1242,13 @@
       { opacity: 0, scale: 0.88, z: -200 },
       { opacity: 1, scale: 1, z: isPortraitMode ? -40 : -100, duration: 1.3, ease: "power2.out" },
       0.3
+    );
+
+    // Light sheen passes across document
+    tl.fromTo(docSweep,
+      { opacity: 0, top: "-100%", left: "-100%" },
+      { opacity: 0.8, top: "100%", left: "100%", duration: 1.5, ease: "power2.inOut" },
+      0.6
     );
 
     // Subtle breathing camera drift
@@ -993,7 +1292,11 @@
       ease: "power2.inOut"
     }, 4.0);
 
-    // Laser scan beam sweeps downward
+    // Laser scan beam sweeps downward + audio sweep
+    tl.add(() => {
+      playLaserSweep();
+    }, 4.2);
+
     tl.to(scannerLine, {
       opacity: 1,
       duration: 0.3
@@ -1005,7 +1308,7 @@
       ease: "power1.inOut"
     }, 4.5);
 
-    // Dynamically calculate and lock Target Box over Identity Table
+    // Lock Target Box over Identity Table + lock-on beep
     tl.add(() => {
       const topOffset = identTable.offsetTop || 155;
       const heightOffset = identTable.offsetHeight || 160;
@@ -1013,6 +1316,7 @@
       targetBox.style.left = isPortraitMode ? "48px" : "40px";
       targetBox.style.right = isPortraitMode ? "48px" : "40px";
       targetBox.style.height = heightOffset + "px";
+      playBeep(640, 0.1, 'square', 0.1);
     }, 5.1);
 
     tl.fromTo(targetBox,
@@ -1057,10 +1361,11 @@
       ease: "power2.out"
     }, 7.8);
 
-    // Swap fields one by one with spring punch
+    // Swap fields one by one with spring punch + snappy click sounds
     tl.add(() => {
       nameBox.className = "id-value-box new";
       nameBox.innerHTML = `Om Bhalerao <span style="font-size:12px;">✓</span>`;
+      playBeep(700, 0.08, 'triangle', 0.15);
     }, 8.4);
 
     tl.fromTo(nameBox, 
@@ -1072,6 +1377,7 @@
     tl.add(() => {
       rollBox.className = "id-value-box new";
       rollBox.innerHTML = `18 <span style="font-size:12px;">✓</span>`;
+      playBeep(780, 0.08, 'triangle', 0.15);
     }, 8.8);
 
     tl.fromTo(rollBox, 
@@ -1083,6 +1389,7 @@
     tl.add(() => {
       batchBox.className = "id-value-box new";
       batchBox.innerHTML = `A1 / D10 <span style="font-size:12px;">✓</span>`;
+      playBeep(880, 0.08, 'triangle', 0.15);
     }, 9.2);
 
     tl.fromTo(batchBox, 
@@ -1094,6 +1401,7 @@
     tl.add(() => {
       prnBox.className = "id-value-box new";
       prnBox.innerHTML = `2023020018 <span style="font-size:12px;">✓</span>`;
+      playBeep(1046.5, 0.1, 'triangle', 0.15);
     }, 9.6);
 
     tl.fromTo(prnBox, 
@@ -1109,7 +1417,11 @@
       duration: 0.4
     }, 9.7);
 
-    // Approved Stamp hits the document
+    // Approved Stamp hits the document + sub-bass thud!
+    tl.add(() => {
+      playSubThud();
+    }, 10.2);
+
     tl.fromTo(docStamp,
       { opacity: 0, scale: 2.2, rotation: -40 },
       { opacity: 1, scale: 1, rotation: -14, duration: 0.5, ease: "back.out(2)" },
@@ -1145,7 +1457,13 @@
       ease: "power3.inOut"
     }, 12.0);
 
-    // Brand Outro enters center stage
+    // Brand Outro enters center stage + chord
+    tl.add(() => {
+      playBeep(523.25, 0.3, 'sine', 0.1);
+      setTimeout(() => playBeep(659.25, 0.35, 'sine', 0.1), 100);
+      setTimeout(() => playBeep(783.99, 0.45, 'sine', 0.12), 200);
+    }, 12.4);
+
     tl.fromTo(brandClimax,
       { opacity: 0, scale: 0.88 },
       { opacity: 1, scale: 1, duration: 0.9, ease: "power3.out" },
@@ -1203,7 +1521,11 @@
 
     // Toggle play/pause on tap / click
     stage.addEventListener('click', (e) => {
+      if (e.target.closest('#sound-btn') || e.target.closest('.brand-action-row')) return;
       if (isDebug && e.target.closest('#debug-panel')) return;
+      
+      initAudio();
+
       if (tl.paused()) {
         tl.play();
         showToast('▶ Playing');
@@ -1219,6 +1541,7 @@
     // Keyboard shortcuts
     window.addEventListener('keydown', (e) => {
       if (e.code === 'Space') {
+        initAudio();
         if (tl.paused()) {
           tl.play();
           showToast('▶ Playing');
@@ -1232,6 +1555,8 @@
       } else if (e.code === 'KeyR') {
         tl.restart();
         showToast('↺ Restarted');
+      } else if (e.code === 'KeyM') {
+        toggleSound();
       }
     });
 
